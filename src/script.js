@@ -32,9 +32,9 @@ const colors = []
 
 const color = new THREE.Color()
 
-const n = 80,
+const n = 20,
   n2 = n / 2 // triangles spread in the cube
-const d = 12,
+const d = 2,
   d2 = d / 2 // individual triangle size
 
 const pA = new THREE.Vector3()
@@ -89,11 +89,22 @@ for (let i = 0; i < triangles; i++) {
 
   // colors
 
-  const vx = x / n + 0.5
-  const vy = y / n + 0.5
-  const vz = z / n + 0.5
-
-  color.setRGB(vx, vy, vz)
+  if (i % 3 != 0) {
+    const vx = 0.15
+    const vy = 0.7
+    const vz = 0.42
+    color.setRGB(vx, vy, vz)
+  } else if (i % 5 != 0) {
+    const vx = 0.1
+    const vy = 0.2
+    const vz = 0.6
+    color.setRGB(vx, vy, vz)
+  } else {
+    const vx = 0.9
+    const vy = 0.1
+    const vz = 0.9
+    color.setRGB(vx, vy, vz)
+  }
 
   const alpha = Math.random()
 
@@ -184,7 +195,7 @@ material.onBeforeCompile = shader => {
 
       // offset.xyz += normal * dist * sin(uTime);
 
-     transformed.xy = offset.xy;
+     transformed.xz = offset.xz;
 
     `
   )
@@ -223,13 +234,20 @@ material.onBeforeCompile = shader => {
       // mat2 rotationMatrix = get2dRotateMatrix(angle);
       // offset.xz = vec2(vPosition.x, vPosition.z) * rotationMatrix;
 
-      diffuseColor.rgb = vec3(normal);
+      // diffuseColor.rgb = vec3(normal);
 
-//        diffuseColor.rgb = vec3(
-//         diffuseColor.r,
-//         diffuseColor.g, 
-//         diffuseColor.b 
-// );
+//       diffuseColor.rgb = vec3(
+//   diffuseColor.r * (normal.x / 0.15),
+//   diffuseColor.g * (normal.y / 0.15),
+//   diffuseColor.b * (normal.z / 0.15)
+// )
+
+
+       diffuseColor.rgb = vec3(
+        diffuseColor.r ,
+        diffuseColor.g , 
+        diffuseColor.b 
+);
 
 
         `
@@ -281,7 +299,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   3500
 )
-camera.position.z = 275
+camera.position.z = 75
 
 scene.add(camera)
 
@@ -320,7 +338,7 @@ const tick = () => {
   controls.update()
 
   // mesh.rotation.x = elapsedTime * 0.05
-  // mesh.rotation.y = elapsedTime * 0.05
+  mesh.rotation.y = elapsedTime * 0.15
 
   // Render
   renderer.render(scene, camera)
