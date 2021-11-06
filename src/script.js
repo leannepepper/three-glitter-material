@@ -18,38 +18,54 @@ const scene = new THREE.Scene()
 
 // Geometry
 
-// const geometry = new THREE.SphereBufferGeometry(1, 100, 100)
+const sampleGeometry = new THREE.SphereBufferGeometry(1, 100, 100)
+const nonIndexedGeometry = sampleGeometry.toNonIndexed()
+
+const sampleMaterial = new THREE.MeshNormalMaterial({
+  flatShading: true
+})
+const sampleMesh = new THREE.Mesh(sampleGeometry, sampleMaterial)
+
+console.log(nonIndexedGeometry)
+scene.add(sampleMesh)
 // const geometry = new THREE.PlaneBufferGeometry(1, 1, 100, 100)
 // const geometry = new THREE.BufferGeometry()
 
-const triangles = 1600
+const vertex = nonIndexedGeometry.getAttribute('position').array //1600
 
 const geometry = new THREE.BufferGeometry()
 
 const positions = []
 const normals = []
 const colors = []
+const indices = []
 
 const color = new THREE.Color()
 
 const n = 20,
   n2 = n / 2 // triangles spread in the cube
-const d = 2,
+const d = 0.2,
   d2 = d / 2 // individual triangle size
 
 const pA = new THREE.Vector3()
 const pB = new THREE.Vector3()
 const pC = new THREE.Vector3()
+const pD = new THREE.Vector3()
 
 const cb = new THREE.Vector3()
 const ab = new THREE.Vector3()
+const cd = new THREE.Vector3()
 
-for (let i = 0; i < triangles; i++) {
-  // positions
+for (let i = 0; i < vertex.length / 3; i++) {
+  const i3 = i * 3
 
-  const x = Math.random() * n - n2
-  const y = Math.random() * n - n2
-  const z = Math.random() * n - n2
+  // const x = Math.random() * n - n2
+  // const y = Math.random() * n - n2
+  // const z = Math.random() * n - n2
+
+  const x = vertex[i3]
+  const y = vertex[i3 + 1]
+  const z = vertex[i3 + 2]
 
   const ax = x + Math.random() * d - d2
   const ay = y + Math.random() * d - d2
@@ -63,25 +79,38 @@ for (let i = 0; i < triangles; i++) {
   const cy = y + Math.random() * d - d2
   const cz = z + Math.random() * d - d2
 
+  const dx = x + Math.random() * d - d2
+  const dy = y + Math.random() * d - d2
+  const dz = z + Math.random() * d - d2
+
   positions.push(ax, ay, az)
   positions.push(bx, by, bz)
   positions.push(cx, cy, cz)
+  positions.push(dx, dy, dz)
+
+  if (i % 2 == 0) {
+    indices.push(i3, i3 + 1, i3 + 2, i3 + 2, i3 + 3, i3)
+  }
 
   // flat face normals
 
   pA.set(ax, ay, az)
   pB.set(bx, by, bz)
   pC.set(cx, cy, cz)
+  pD.set(dx, dy, dz)
 
+  cd.subVectors(pC, pD)
   cb.subVectors(pC, pB)
   ab.subVectors(pA, pB)
+
   cb.cross(ab)
+  cd.cross(cb)
 
-  cb.normalize()
+  cd.normalize()
 
-  const nx = cb.x
-  const ny = cb.y
-  const nz = cb.z
+  const nx = cd.x
+  const ny = cd.y
+  const nz = cd.z
 
   normals.push(nx, ny, nz)
   normals.push(nx, ny, nz)
@@ -121,6 +150,9 @@ geometry.setAttribute(
   'position',
   new THREE.Float32BufferAttribute(positions, 3).onUpload(disposeArray)
 )
+
+geometry.setIndex(indices)
+
 geometry.setAttribute(
   'normal',
   new THREE.Float32BufferAttribute(normals, 3).onUpload(disposeArray)
@@ -195,7 +227,7 @@ material.onBeforeCompile = shader => {
 
       // offset.xyz += normal * dist * sin(uTime);
 
-     transformed.xz = offset.xz;
+     //transformed.xz = offset.xz;
 
     `
   )
@@ -338,7 +370,7 @@ const tick = () => {
   controls.update()
 
   // mesh.rotation.x = elapsedTime * 0.05
-  mesh.rotation.y = elapsedTime * 0.15
+  // mesh.rotation.y = elapsedTime * 0.15
 
   // Render
   renderer.render(scene, camera)
