@@ -73,44 +73,7 @@ material.onBeforeCompile = shader => {
       varying vec2 vUv;
       varying vec3 vPosition;
       uniform float uRandomValue;
-     
-    vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-
-    vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
-    float cnoise(vec2 P){
-      vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
-      vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-      Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
-      vec4 ix = Pi.xzxz;
-      vec4 iy = Pi.yyww;
-      vec4 fx = Pf.xzxz;
-      vec4 fy = Pf.yyww;
-      vec4 i = permute(permute(ix) + iy);
-      vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
-      vec4 gy = abs(gx) - 0.5;
-      vec4 tx = floor(gx + 0.5);
-      gx = gx - tx;
-      vec2 g00 = vec2(gx.x,gy.x);
-      vec2 g10 = vec2(gx.y,gy.y);
-      vec2 g01 = vec2(gx.z,gy.z);
-      vec2 g11 = vec2(gx.w,gy.w);
-      vec4 norm = 1.79284291400159 - 0.85373472095314 * 
-        vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
-      g00 *= norm.x;
-      g01 *= norm.y;
-      g10 *= norm.z;
-      g11 *= norm.w;
-      float n00 = dot(g00, vec2(fx.x, fy.x));
-      float n10 = dot(g10, vec2(fx.y, fy.y));
-      float n01 = dot(g01, vec2(fx.z, fy.z));
-      float n11 = dot(g11, vec2(fx.w, fy.w));
-      vec2 fade_xy = fade(Pf.xy);
-      vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-      float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-      return 2.3 * n_xy;
-    }
-
+    
 
       vec3 hash3( vec2 p ){
           vec3 q = vec3( dot(p,vec2(127.1,311.7)),
@@ -120,17 +83,31 @@ material.onBeforeCompile = shader => {
       }
 
       float iqnoise( in vec2 x, float u, float v, vec3 vnormal ) {
-          vec2 p = floor(x);
-          vec2 f = fract(x);
+
+        // ---------------------------------
+        //  Specular Lighting 
+        // ---------------------------------
+
+       vec3 addedLights = vec3(0.0,0.0,0.0);
+          
+         if(rand(vUv.xy) > 0.9) {
+            vec3 pointLightPosition = vec3(vPosition) + vec3(0.0,0.0,0.5);
+            vec3 pointLightColor = vec3(0.0,1.0,0.0);
+            vec3 lightDirection = normalize(vPosition - pointLightPosition);
+            addedLights.rgb += clamp(dot(-lightDirection, vnormal), 0.0, 1.0) * pointLightColor;
+          }
+
+        vec2 p = floor(x);
+        vec2 f = fract(x);
 
         float k = 1.0+63.0*pow(1.0-v,4.0);
 
-        float va = 0.0;
+        float va = 0.0 + addedLights.b;
         float wt = 0.0;
           for( int j=-2; j<=2; j++ )
           for( int i=-2; i<=2; i++ ) {
             vec2 g = vec2( float(i),float(j) );
-            vec3 o = hash3( p + g );
+            vec3 o = hash3( p + g ) + addedLights;
             vec2 r = g - f + o.xy;
             float d = dot(r,r);
             float ww = pow( 1.0-smoothstep(0.5,1.414,sqrt(d)),  k );
@@ -140,6 +117,7 @@ material.onBeforeCompile = shader => {
 
           return va/wt;
       }
+
       `
   )
 
@@ -154,9 +132,12 @@ material.onBeforeCompile = shader => {
           p = p*p*(3.0-2.0*p);
           p = p*p*(3.0-2.0*p);
 
-          float f = iqnoise( 250.0*(vUv.xy), 1.0, 0.03, normal );
+         float f = iqnoise( 100.0*(vUv.xy), 1.0, 0.03, normal );
           
-          diffuseColor.rgb /= vec3(f);
+          vec3 c = vec3(f); 
+          //vec3 col = mix( vec3(0.0), addedLights.rgb, smoothstep( 0.25, (0.65), c.x ) );
+          diffuseColor.rgb /= vec3(c);
+        
           
           `
   )
