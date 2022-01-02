@@ -18,15 +18,15 @@ const scene = new THREE.Scene()
 
 // Geometry
 
-const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
-//const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
+//const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
+const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
 
 // Material
 const material = new THREE.MeshPhongMaterial({
-  // transparent: true,
+  transparent: true,
   shininess: 550,
-  // vertexColors: true,
-  color: 'hotpink'
+  //vertexColors: true,
+  color: 'green'
   // side: THREE.DoubleSide
 })
 
@@ -82,40 +82,40 @@ material.onBeforeCompile = shader => {
         return fract(sin(q)*43758.5453);
       }
 
+      vec3 findSpecLight (vec3 vnormal) {
+         vec3 addedLights = vec3(0.0,0.0,0.0);
+      
+          vec3 pointLightPosition = vec3(vPosition) + vec3(.0,.0,1.0);
+          vec3 pointLightColor = vec3(1.0, 1.0, 1.0);
+          vec3 lightDirection = normalize(vPosition - pointLightPosition);
+          addedLights.rgb += clamp(dot(-lightDirection, vnormal), 0., .9) * pointLightColor;
+          //addedLights.b += sin(uTime );
+
+          return addedLights;
+      }
+
       float iqnoise( in vec2 x, float u, float v, vec3 vnormal ) {
-
-        // ---------------------------------
-        //  Specular Lighting 
-        // ---------------------------------
-
-       vec3 addedLights = vec3(0.0,0.0,0.0);
-          
-         if(rand(vUv.xy) > 0.9) {
-            vec3 pointLightPosition = vec3(vPosition) + vec3(0.0,0.0,0.5);
-            vec3 pointLightColor = vec3(0.0,1.0,0.0);
-            vec3 lightDirection = normalize(vPosition - pointLightPosition);
-            addedLights.rgb += clamp(dot(-lightDirection, vnormal), 0.0, 1.0) * pointLightColor;
-          }
+       // vec3 specLighting = findSpecLight(vnormal);
 
         vec2 p = floor(x);
         vec2 f = fract(x);
 
         float k = 1.0+63.0*pow(1.0-v,4.0);
 
-        float va = 0.0 + addedLights.b;
+        float va = 0.0;
         float wt = 0.0;
           for( int j=-2; j<=2; j++ )
           for( int i=-2; i<=2; i++ ) {
             vec2 g = vec2( float(i),float(j) );
-            vec3 o = hash3( p + g ) + addedLights;
+            vec3 o = hash3( p + g ) ;
             vec2 r = g - f + o.xy;
             float d = dot(r,r);
-            float ww = pow( 1.0-smoothstep(0.5,1.414,sqrt(d)),  k );
-            va += o.z*ww; //* sin(uTime * 0.2);
+            float ww = pow( 1.0-smoothstep(0.04,.0814,sqrt(d)),  k );
+            va += o.z*ww;
             wt += ww ;
           }
 
-          return va/wt;
+          return va / wt;
       }
 
       `
@@ -126,17 +126,15 @@ material.onBeforeCompile = shader => {
     `
         #include <normal_fragment_begin>
 
-         vec2 p = 0.5 - 0.5*sin( vUv );
+         vec3 specLighting = findSpecLight(normal);
 
-          p = p*p*(3.0-2.0*p);
-          p = p*p*(3.0-2.0*p);
-          p = p*p*(3.0-2.0*p);
-
-         float f = iqnoise( 100.0*(vUv.xy), 1.0, 0.03, normal );
+         float f = iqnoise( 500.0*(vUv.xy), 1.0, 0.03, normal );
           
-          vec3 c = vec3(f); 
-          //vec3 col = mix( vec3(0.0), addedLights.rgb, smoothstep( 0.25, (0.65), c.x ) );
-          diffuseColor.rgb /= vec3(c);
+          vec3 c = vec3(f) - specLighting; // START HERE  
+          //vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep( 0.23, (0.45), c.z ) );
+          diffuseColor.rgb /= vec3(c) ;
+          //diffuseColor.rgb = mix(vec3(diffuseColor.x, diffuseColor.y, diffuseColor.z), specLighting, specLighting) + vec3(col);
+
         
           
           `
@@ -151,7 +149,7 @@ scene.add(new THREE.AmbientLight(0x444444, 1.6))
 
 const light1 = new THREE.DirectionalLight(0xffffff, 0.4)
 light1.position.set(0, 3, 30)
-//scene.add(light1)
+// scene.add(light1)
 
 const light2 = new THREE.DirectionalLight(0xffffff, 1.5)
 light2.position.set(0, -1, 0)
@@ -221,8 +219,8 @@ const tick = () => {
   // Update controls
   controls.update()
 
-  mesh.rotation.x = elapsedTime * 0.05
-  mesh.rotation.y = elapsedTime * 0.15
+  mesh.rotation.x = elapsedTime * 0.3
+  mesh.rotation.y = elapsedTime * 0.3
   light1.position.x = Math.sin(elapsedTime) * 2.5
   light1.position.y = Math.sin(elapsedTime * 0.5) * 100.5
 
