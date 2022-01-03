@@ -2,6 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
 import * as dat from 'dat.gui'
 
 /**
@@ -16,32 +17,57 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+/**
+ * Fonts
+ */
+const fontLoader = new THREE.FontLoader()
+
+fontLoader.load('/fonts/gentillis_bold.typeface.json', font => {
+  const textGeometry = new THREE.TextGeometry('Glitter', {
+    font: font,
+    size: 4.5,
+    height: 0.2,
+    curveSegments: 20,
+    bevelEnabled: true,
+    bevelThickness: 0.3,
+    bevelSize: 0.01,
+    bevelOffset: 0,
+    bevelSegments: 10
+  })
+
+  addGlitterToText(textGeometry)
+  // const textMaterial = new THREE.MeshBasicMaterial({ wireframe: false })
+  // const text = new THREE.Mesh(textGeometry, textMaterial)
+  // scene.add(text)
+})
+
 // Geometry
 
-//const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
-const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
-
-// Material
-const material = new THREE.MeshPhongMaterial({
-  transparent: true,
-  shininess: 550,
-  //vertexColors: true,
-  color: 'green'
-  // side: THREE.DoubleSide
-})
+const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
+//const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
 
 const customUniforms = {
   uTime: { value: 0 },
   uRandomValue: { value: Math.random() }
 }
 
-material.onBeforeCompile = shader => {
-  shader.uniforms.uTime = customUniforms.uTime
-  shader.uniforms.uRandomValue = customUniforms.uRandomValue
+function addGlitterToText (textGeometry) {
+  // Material
+  const material = new THREE.MeshPhongMaterial({
+    transparent: false,
+    //shininess: 550,
+    //vertexColors: true,
+    color: 'hotpink' //'#001658'
+    // side: THREE.DoubleSide
+  })
 
-  shader.vertexShader = shader.vertexShader.replace(
-    '#include <common>',
-    `
+  material.onBeforeCompile = shader => {
+    shader.uniforms.uTime = customUniforms.uTime
+    shader.uniforms.uRandomValue = customUniforms.uRandomValue
+
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <common>',
+      `
               #include <common>
 
               uniform float uTime;
@@ -51,22 +77,22 @@ material.onBeforeCompile = shader => {
 
 
           `
-  )
+    )
 
-  shader.vertexShader = shader.vertexShader.replace(
-    '#include <begin_vertex>',
-    `
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      `
           #include <begin_vertex>
           vUv = uv;
 
       `
-  )
+    )
 
-  //   Fragment Shader
+    //   Fragment Shader
 
-  shader.fragmentShader = shader.fragmentShader.replace(
-    '#include <common>',
-    `
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <common>',
+      `
     // Created by inigo quilez - iq/2014
       #include <common>
       uniform float uTime;
@@ -82,14 +108,15 @@ material.onBeforeCompile = shader => {
         return fract(sin(q)*43758.5453);
       }
 
-      vec3 findSpecLight (vec3 vnormal) {
+      vec3 findSpecLight (vec3 vnormal, vec3 diffuseColor) {
          vec3 addedLights = vec3(0.0,0.0,0.0);
       
           vec3 pointLightPosition = vec3(vPosition) + vec3(.0,.0,1.0);
           vec3 pointLightColor = vec3(1.0, 1.0, 1.0);
           vec3 lightDirection = normalize(vPosition - pointLightPosition);
           addedLights.rgb += clamp(dot(-lightDirection, vnormal), 0., .9) * pointLightColor;
-          //addedLights.b += sin(uTime );
+          addedLights.rgb *= vec3(diffuseColor.rgb);
+
 
           return addedLights;
       }
@@ -110,7 +137,7 @@ material.onBeforeCompile = shader => {
             vec3 o = hash3( p + g ) ;
             vec2 r = g - f + o.xy;
             float d = dot(r,r);
-            float ww = pow( 1.0-smoothstep(0.04,.0814,sqrt(d)),  k );
+            float ww = pow( 1.0-smoothstep(0.04,.140,sqrt(d)),  k );
             va += o.z*ww;
             wt += ww ;
           }
@@ -119,31 +146,36 @@ material.onBeforeCompile = shader => {
       }
 
       `
-  )
+    )
 
-  shader.fragmentShader = shader.fragmentShader.replace(
-    '#include <normal_fragment_begin>',
-    `
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <normal_fragment_begin>',
+      `
         #include <normal_fragment_begin>
 
-         vec3 specLighting = findSpecLight(normal);
+         vec3 specLighting = findSpecLight(normal, diffuseColor.rgb);
 
-         float f = iqnoise( 500.0*(vUv.xy), 1.0, 0.03, normal );
+         float f = iqnoise( 200.0*(vUv.xy)*vec2(10,10), .9, 1.0, normal );
           
-          vec3 c = vec3(f) - specLighting; // START HERE  
-          //vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep( 0.23, (0.45), c.z ) );
-          diffuseColor.rgb /= vec3(c) ;
-          //diffuseColor.rgb = mix(vec3(diffuseColor.x, diffuseColor.y, diffuseColor.z), specLighting, specLighting) + vec3(col);
+          vec3 c = vec3(f);
+          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep( 0.5, 0.1, c.x ) ); // change step number for sparkly density;
+          //diffuseColor.rgb /= vec3(c) ;
+          diffuseColor.rgb /= mix(vec3(col), vec3(c), vec3(0.90));
 
         
           
           `
-  )
+    )
+  }
+
+  const text = new THREE.Mesh(textGeometry, material)
+  text.position.x = -8
+  scene.add(text)
 }
 
 // Mesh
-const mesh = new THREE.Mesh(geometry, material)
-scene.add(mesh)
+//const mesh = new THREE.Mesh(geometry, material)
+//scene.add(mesh)
 
 scene.add(new THREE.AmbientLight(0x444444, 1.6))
 
@@ -188,6 +220,7 @@ const camera = new THREE.PerspectiveCamera(
 )
 camera.position.z = 60
 
+scene.background = new THREE.Color('#ffdde2')
 scene.add(camera)
 
 // Controls
@@ -219,8 +252,8 @@ const tick = () => {
   // Update controls
   controls.update()
 
-  mesh.rotation.x = elapsedTime * 0.3
-  mesh.rotation.y = elapsedTime * 0.3
+  // mesh.rotation.x = elapsedTime * 0.3
+  // mesh.rotation.y = elapsedTime * 0.3
   light1.position.x = Math.sin(elapsedTime) * 2.5
   light1.position.y = Math.sin(elapsedTime * 0.5) * 100.5
 
