@@ -16,11 +16,13 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+let mouse = new THREE.Vector3(0, 0, 1)
 
 /**
  * Fonts
  */
 const fontLoader = new THREE.FontLoader()
+let newMesh = null
 
 fontLoader.load('/fonts/gentillis_bold.typeface.json', font => {
   const textGeometry = new THREE.TextGeometry('Glitter', {
@@ -35,15 +37,12 @@ fontLoader.load('/fonts/gentillis_bold.typeface.json', font => {
     bevelSegments: 10
   })
 
-  addGlitterToText(textGeometry)
-  // const textMaterial = new THREE.MeshBasicMaterial({ wireframe: false })
-  // const text = new THREE.Mesh(textGeometry, textMaterial)
-  // scene.add(text)
+  newMesh = addGlitterToText(textGeometry)
 })
 
 // Geometry
 
-const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
+//const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
 //const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
 
 const customUniforms = {
@@ -51,13 +50,15 @@ const customUniforms = {
   uRandomValue: { value: Math.random() }
 }
 
-function addGlitterToText (textGeometry) {
+//addGlitterToText(geometry)
+
+function addGlitterToText (geometry) {
   // Material
   const material = new THREE.MeshPhongMaterial({
     transparent: false,
     //shininess: 550,
     //vertexColors: true,
-    color: 'hotpink' //'#001658'
+    color: 'darkgreen' // 6a0dad
     // side: THREE.DoubleSide
   })
 
@@ -114,9 +115,9 @@ function addGlitterToText (textGeometry) {
           vec3 pointLightPosition = vec3(vPosition) + vec3(.0,.0,1.0);
           vec3 pointLightColor = vec3(1.0, 1.0, 1.0);
           vec3 lightDirection = normalize(vPosition - pointLightPosition);
+                  
           addedLights.rgb += clamp(dot(-lightDirection, vnormal), 0., .9) * pointLightColor;
           addedLights.rgb *= vec3(diffuseColor.rgb);
-
 
           return addedLights;
       }
@@ -155,12 +156,12 @@ function addGlitterToText (textGeometry) {
 
          vec3 specLighting = findSpecLight(normal, diffuseColor.rgb);
 
-         float f = iqnoise( 200.0*(vUv.xy)*vec2(10,10), .9, 1.0, normal );
+         float f = iqnoise( 200.0*(vUv.xy)*vec2(10,10), .1, 1.0, normal );
           
           vec3 c = vec3(f);
-          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep( 0.5, 0.1, c.x ) ); // change step number for sparkly density;
+          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep( 0.5, 0.2, c.x ) ); // change step number for sparkly density;
           //diffuseColor.rgb /= vec3(c) ;
-          diffuseColor.rgb /= mix(vec3(col), vec3(c), vec3(0.90));
+          diffuseColor.rgb /= mix(vec3(col), vec3(c), vec3(0.0));
 
         
           
@@ -168,20 +169,22 @@ function addGlitterToText (textGeometry) {
     )
   }
 
-  const text = new THREE.Mesh(textGeometry, material)
+  const text = new THREE.Mesh(geometry, material)
   text.position.x = -8
   scene.add(text)
+
+  return text
 }
 
 // Mesh
 //const mesh = new THREE.Mesh(geometry, material)
 //scene.add(mesh)
 
-scene.add(new THREE.AmbientLight(0x444444, 1.6))
+scene.add(new THREE.AmbientLight(0x444444, 2.6))
 
-const light1 = new THREE.DirectionalLight(0xffffff, 0.4)
-light1.position.set(0, 3, 30)
-// scene.add(light1)
+const light1 = new THREE.PointLight(0xffffff, 0.9)
+light1.position.set(3, 30, 30)
+scene.add(light1)
 
 const light2 = new THREE.DirectionalLight(0xffffff, 1.5)
 light2.position.set(0, -1, 0)
@@ -194,6 +197,27 @@ const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
 }
+
+// Mouse Move
+function handleMouseMove (event) {
+  mouse.x = (event.clientX / sizes.width) * 2 - 1
+  mouse.y = -(event.clientY / sizes.height) * 2 + 1
+  mouse.z = 1
+
+  // convert screen coordinates to threejs world position
+  // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
+
+  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5)
+  vector.unproject(camera)
+  var dir = vector.sub(camera.position).normalize()
+  var distance = -camera.position.z / dir.z
+  var pos = camera.position.clone().add(dir.multiplyScalar(distance))
+
+  light1.position.set(pos.x, pos.y, 5.0)
+  mouse = pos
+}
+
+window.addEventListener('mousemove', handleMouseMove)
 
 window.addEventListener('resize', () => {
   // Update sizes
@@ -220,7 +244,7 @@ const camera = new THREE.PerspectiveCamera(
 )
 camera.position.z = 60
 
-scene.background = new THREE.Color('#ffdde2')
+scene.background = new THREE.Color('#151515')
 scene.add(camera)
 
 // Controls
@@ -252,10 +276,14 @@ const tick = () => {
   // Update controls
   controls.update()
 
-  // mesh.rotation.x = elapsedTime * 0.3
+  if (newMesh) {
+    newMesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2
+    newMesh.rotation.y = Math.sin(elapsedTime * 0.3) * 0.2
+  }
+
   // mesh.rotation.y = elapsedTime * 0.3
-  light1.position.x = Math.sin(elapsedTime) * 2.5
-  light1.position.y = Math.sin(elapsedTime * 0.5) * 100.5
+  // light1.position.x = Math.sin(elapsedTime) * 2.5
+  // light1.position.y = Math.sin(elapsedTime * 0.5) * 100.5
 
   // Render
   renderer.render(scene, camera)
