@@ -1,18 +1,18 @@
 import './style.css'
 import * as THREE from 'three'
 
-export function GlitterMaterial (customUniforms, color) {
-  const material = new THREE.MeshPhongMaterial({
-    color
-  })
+export class GlitterMaterial extends THREE.MeshPhongMaterial {
+  constructor (customUniforms, parameters) {
+    super()
+    this.customUniforms = customUniforms
+    this.setValues(parameters)
+    this.onBeforeCompile = shader => {
+      shader.uniforms.uGlitterSize = this.customUniforms.uGlitterSize
+      shader.uniforms.uGlitterDensity = this.customUniforms.uGlitterDensity
 
-  material.onBeforeCompile = shader => {
-    shader.uniforms.uGlitterSize = customUniforms.uGlitterSize
-    shader.uniforms.uGlitterDensity = customUniforms.uGlitterDensity
-
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <common>',
-      `
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        `
               #include <common>
               uniform float uGlitterSize;
               uniform float uGlitterDensity;
@@ -21,22 +21,22 @@ export function GlitterMaterial (customUniforms, color) {
 
 
           `
-    )
+      )
 
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      `
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        `
           #include <begin_vertex>
           vUv = uv;
 
       `
-    )
+      )
 
-    //   Fragment Shader
+      //   Fragment Shader
 
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <common>',
-      `
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <common>',
+        `
     // Created by Inigo Quilez - iq/2014
     // Modified by Leanne Werner - 2022
 
@@ -91,11 +91,11 @@ export function GlitterMaterial (customUniforms, color) {
       }
 
       `
-    )
+      )
 
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <normal_fragment_begin>',
-      `
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <normal_fragment_begin>',
+        `
         #include <normal_fragment_begin>
 
          vec3 specLighting = findSpecLight(normal, diffuseColor.rgb);
@@ -105,8 +105,8 @@ export function GlitterMaterial (customUniforms, color) {
           vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep(0.25 + uGlitterDensity, .25, c.x ) );
           diffuseColor.rgb /= mix(vec3(col), vec3(c), vec3(0.0));
           `
-    )
+      )
+    }
   }
-
-  return material
+  // return material
 }

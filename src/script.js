@@ -6,7 +6,7 @@ import * as dat from 'dat.gui'
 
 const gui = new dat.GUI()
 const debugObject = {}
-debugObject.glitterColor = '#7b0fdc'
+debugObject.glitterColor = '#dc630f'
 debugObject.animate = false
 
 const canvas = document.querySelector('canvas.webgl')
@@ -31,11 +31,11 @@ let textGeometry = null
 fontLoader.load('/fonts/pacifico/pacifico-regular-normal-400.json', font => {
   textGeometry = new THREE.TextGeometry('glitter', {
     font: font,
-    size: 4.5,
+    size: 5.5,
     height: 0.2,
     curveSegments: 20,
     bevelEnabled: true,
-    bevelThickness: 0.3,
+    bevelThickness: 1.2,
     bevelSize: 0.01,
     bevelOffset: 0,
     bevelSegments: 10
@@ -77,11 +77,13 @@ gui
 gui.add(debugObject, 'animate').name('animate')
 
 function addGlitterToText (geometry) {
-  const material = GlitterMaterial(customUniforms, debugObject.glitterColor)
+  const material = new GlitterMaterial(customUniforms, {
+    color: debugObject.glitterColor
+  })
   const mesh = new THREE.Mesh(geometry, material)
 
   mesh.name = 'textMesh'
-  mesh.position.x = -8
+  mesh.position.x = -10
   scene.add(mesh)
   return mesh
 }
