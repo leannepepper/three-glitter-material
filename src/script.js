@@ -2,7 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-
+//import typefaceData from '../fonts/pacifico/pacifico-regular-normal-400.json'
 import * as dat from 'dat.gui'
 
 /**
@@ -23,10 +23,13 @@ let mouse = new THREE.Vector3(0, 0, 1)
  * Fonts
  */
 const fontLoader = new THREE.FontLoader()
-let newMesh = null
+// const font = new THREE.FontLoader().parse(typefaceData)
 
-fontLoader.load('/fonts/gentillis_bold.typeface.json', font => {
-  const textGeometry = new THREE.TextGeometry('Glitter', {
+let newMesh = null
+let textGeometry = null
+
+fontLoader.load('/fonts/pacifico/pacifico-regular-normal-400.json', font => {
+  textGeometry = new THREE.TextGeometry('glitter', {
     font: font,
     size: 4.5,
     height: 0.2,
@@ -38,15 +41,15 @@ fontLoader.load('/fonts/gentillis_bold.typeface.json', font => {
     bevelSegments: 10
   })
 
-  //newMesh = addGlitterToText(textGeometry)
+  newMesh = addGlitterToText(textGeometry)
 })
 
 // Geometry
 
 // const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
-const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
+// const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
 
-debugObject.glitterColor = '#7800a9'
+debugObject.glitterColor = '#7b0fdc'
 
 const customUniforms = {
   uTime: { value: 0 },
@@ -57,7 +60,13 @@ const customUniforms = {
 
 gui.addColor(debugObject, 'glitterColor').onChange(value => {
   debugObject.glitterColor = value.toString()
-  newMesh = addGlitterToText(geometry)
+  const object = scene.getObjectByProperty('name', 'textMesh')
+
+  object.geometry.dispose()
+  object.material.dispose()
+  scene.remove(object)
+
+  newMesh = addGlitterToText(textGeometry)
 })
 
 gui
@@ -74,7 +83,7 @@ gui
   .step(0.001)
   .name('glitterDensity')
 
-newMesh = addGlitterToText(geometry)
+//newMesh = addGlitterToText(geometry)
 
 function addGlitterToText (geometry) {
   // Material
@@ -119,7 +128,9 @@ function addGlitterToText (geometry) {
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <common>',
       `
-    // Created by inigo quilez - iq/2014
+    // Created by Inigo Quilez - iq/2014
+    // Modified by Leanne Werner - 2022
+
       #include <common>
       uniform float uTime;
       varying vec2 vUv;
@@ -181,25 +192,20 @@ function addGlitterToText (geometry) {
         #include <normal_fragment_begin>
 
          vec3 specLighting = findSpecLight(normal, diffuseColor.rgb);
-
          float f = iqnoise( uGlitterSize*(vUv.xy)*vec2(2,2), .1, 1.0, normal );
           
           vec3 c = vec3(f);
-          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep(0.25 + uGlitterDensity, .25, c.x ) ); // change step number for sparkly density;
-          //diffuseColor.rgb /= vec3(c) ;
+          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep(0.25 + uGlitterDensity, .25, c.x ) );
           diffuseColor.rgb /= mix(vec3(col), vec3(c), vec3(0.0));
-
-        
-          
           `
     )
   }
 
-  const text = new THREE.Mesh(geometry, material)
-  // text.position.x = -8
-  scene.add(text)
-
-  return text
+  const mesh = new THREE.Mesh(geometry, material)
+  mesh.name = 'textMesh'
+  mesh.position.x = -8
+  scene.add(mesh)
+  return mesh
 }
 
 // Mesh
@@ -211,10 +217,6 @@ scene.add(new THREE.AmbientLight(0x444444, 2.6))
 const light1 = new THREE.PointLight(0xffffff, 0.9)
 light1.position.set(3, 30, 30)
 scene.add(light1)
-
-const light2 = new THREE.DirectionalLight(0xffffff, 1.5)
-light2.position.set(0, -1, 0)
-// scene.add(light2)
 
 /**
  * Sizes
@@ -230,14 +232,11 @@ function handleMouseMove (event) {
   mouse.y = -(event.clientY / sizes.height) * 2 + 1
   mouse.z = 1
 
-  // convert screen coordinates to threejs world position
-  // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
-
-  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5)
+  const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5)
   vector.unproject(camera)
-  var dir = vector.sub(camera.position).normalize()
-  var distance = -camera.position.z / dir.z
-  var pos = camera.position.clone().add(dir.multiplyScalar(distance))
+  const dir = vector.sub(camera.position).normalize()
+  const distance = -camera.position.z / dir.z
+  const pos = camera.position.clone().add(dir.multiplyScalar(distance))
 
   light1.position.set(pos.x, pos.y, 10.0)
   mouse = pos
@@ -306,10 +305,6 @@ const tick = () => {
     // newMesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2
     // newMesh.rotation.y = Math.sin(elapsedTime * 0.3) * 0.2
   }
-
-  // mesh.rotation.y = elapsedTime * 0.3
-  // light1.position.x = Math.sin(elapsedTime) * 2.5
-  // light1.position.y = Math.sin(elapsedTime * 0.5) * 100.5
 
   // Render
   renderer.render(scene, camera)
