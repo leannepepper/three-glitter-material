@@ -10,6 +10,7 @@ import * as dat from 'dat.gui'
  */
 // Debug
 const gui = new dat.GUI()
+const debugObject = {}
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -37,34 +38,56 @@ fontLoader.load('/fonts/gentillis_bold.typeface.json', font => {
     bevelSegments: 10
   })
 
-  newMesh = addGlitterToText(textGeometry)
+  //newMesh = addGlitterToText(textGeometry)
 })
 
 // Geometry
 
-//const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
-//const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
+// const geometry = new THREE.SphereBufferGeometry(10, 100, 100)
+const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16)
+
+debugObject.glitterColor = '#7800a9'
 
 const customUniforms = {
   uTime: { value: 0 },
-  uRandomValue: { value: Math.random() }
+  uRandomValue: { value: Math.random() },
+  uGlitterSize: { value: 350.0 },
+  uGlitterDensity: { value: 0.1 }
 }
 
-//addGlitterToText(geometry)
+gui.addColor(debugObject, 'glitterColor').onChange(value => {
+  debugObject.glitterColor = value.toString()
+  newMesh = addGlitterToText(geometry)
+})
+
+gui
+  .add(customUniforms.uGlitterSize, 'value')
+  .min(50.0)
+  .max(500.0)
+  .step(10.0)
+  .name('glitterSize')
+
+gui
+  .add(customUniforms.uGlitterDensity, 'value')
+  .min(0.0)
+  .max(1.0)
+  .step(0.001)
+  .name('glitterDensity')
+
+newMesh = addGlitterToText(geometry)
 
 function addGlitterToText (geometry) {
   // Material
   const material = new THREE.MeshPhongMaterial({
     transparent: false,
-    //shininess: 550,
-    //vertexColors: true,
-    color: 'darkgreen' // 6a0dad
-    // side: THREE.DoubleSide
+    color: debugObject.glitterColor // #6a0dad
   })
 
   material.onBeforeCompile = shader => {
     shader.uniforms.uTime = customUniforms.uTime
     shader.uniforms.uRandomValue = customUniforms.uRandomValue
+    shader.uniforms.uGlitterSize = customUniforms.uGlitterSize
+    shader.uniforms.uGlitterDensity = customUniforms.uGlitterDensity
 
     shader.vertexShader = shader.vertexShader.replace(
       '#include <common>',
@@ -73,6 +96,8 @@ function addGlitterToText (geometry) {
 
               uniform float uTime;
               uniform float uRandomValue;
+              uniform float uGlitterSize;
+              uniform float uGlitterDensity;
               varying vec2 vUv;
               varying vec3 vPosition;
 
@@ -100,6 +125,8 @@ function addGlitterToText (geometry) {
       varying vec2 vUv;
       varying vec3 vPosition;
       uniform float uRandomValue;
+      uniform float uGlitterSize;
+      uniform float uGlitterDensity;
     
 
       vec3 hash3( vec2 p ){
@@ -123,8 +150,7 @@ function addGlitterToText (geometry) {
       }
 
       float iqnoise( in vec2 x, float u, float v, vec3 vnormal ) {
-       // vec3 specLighting = findSpecLight(vnormal);
-
+       
         vec2 p = floor(x);
         vec2 f = fract(x);
 
@@ -156,10 +182,10 @@ function addGlitterToText (geometry) {
 
          vec3 specLighting = findSpecLight(normal, diffuseColor.rgb);
 
-         float f = iqnoise( 200.0*(vUv.xy)*vec2(10,10), .1, 1.0, normal );
+         float f = iqnoise( uGlitterSize*(vUv.xy)*vec2(2,2), .1, 1.0, normal );
           
           vec3 c = vec3(f);
-          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep( 0.5, 0.2, c.x ) ); // change step number for sparkly density;
+          vec3 col = mix( vec3(1.0), specLighting.rgb, smoothstep(0.25 + uGlitterDensity, .25, c.x ) ); // change step number for sparkly density;
           //diffuseColor.rgb /= vec3(c) ;
           diffuseColor.rgb /= mix(vec3(col), vec3(c), vec3(0.0));
 
@@ -170,7 +196,7 @@ function addGlitterToText (geometry) {
   }
 
   const text = new THREE.Mesh(geometry, material)
-  text.position.x = -8
+  // text.position.x = -8
   scene.add(text)
 
   return text
@@ -213,7 +239,7 @@ function handleMouseMove (event) {
   var distance = -camera.position.z / dir.z
   var pos = camera.position.clone().add(dir.multiplyScalar(distance))
 
-  light1.position.set(pos.x, pos.y, 5.0)
+  light1.position.set(pos.x, pos.y, 10.0)
   mouse = pos
 }
 
@@ -244,7 +270,7 @@ const camera = new THREE.PerspectiveCamera(
 )
 camera.position.z = 60
 
-scene.background = new THREE.Color('#151515')
+scene.background = new THREE.Color('#a9ffff')
 scene.add(camera)
 
 // Controls
@@ -277,8 +303,8 @@ const tick = () => {
   controls.update()
 
   if (newMesh) {
-    newMesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2
-    newMesh.rotation.y = Math.sin(elapsedTime * 0.3) * 0.2
+    // newMesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2
+    // newMesh.rotation.y = Math.sin(elapsedTime * 0.3) * 0.2
   }
 
   // mesh.rotation.y = elapsedTime * 0.3
