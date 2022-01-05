@@ -1,171 +1,182 @@
-import './style.css'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { GlitterMaterial } from './glitterMaterial'
-import * as dat from 'dat.gui'
+import { render } from 'react-dom'
 
-const gui = new dat.GUI()
-const debugObject = {}
-debugObject.glitterColor = '#dc630f'
-debugObject.animate = false
+import App from './App'
 
-const canvas = document.querySelector('canvas.webgl')
-const scene = new THREE.Scene()
-scene.background = new THREE.Color('#a9ffff')
+const rootElement = document.getElementById('root')
+render(<App />, rootElement)
 
-let mouse = new THREE.Vector3(0, 0, 0)
+// import './style.css'
+// import * as THREE from 'three'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import { GlitterMaterial } from './glitterMaterial'
+// import * as dat from 'dat.gui'
 
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight
-}
+// const gui = new dat.GUI()
+// const debugObject = {}
+// debugObject.glitterColor = '#dc630f'
 
-/**
- * Font
- */
-const fontLoader = new THREE.FontLoader()
+// const canvas = document.querySelector('canvas.webgl')
+// const scene = new THREE.Scene()
+// let mouse = new THREE.Vector3(0, 0, 0)
+// const meshes = []
 
-let mesh = null
-let textGeometry = null
+// const sizes = {
+//   width: window.innerWidth,
+//   height: window.innerHeight
+// }
 
-fontLoader.load('/fonts/pacifico/pacifico-regular-normal-400.json', font => {
-  textGeometry = new THREE.TextGeometry('glitter', {
-    font: font,
-    size: 5.5,
-    height: 0.2,
-    curveSegments: 20,
-    bevelEnabled: true,
-    bevelThickness: 1.2,
-    bevelSize: 0.01,
-    bevelOffset: 0,
-    bevelSegments: 10
-  })
+// /**
+//  * Font
+//  */
+// const fontLoader = new THREE.FontLoader()
 
-  mesh = addGlitterToText(textGeometry)
-})
+// let textMaterial = null
 
-const customUniforms = {
-  uGlitterSize: { value: 350.0 },
-  uGlitterDensity: { value: 0.1 }
-}
+// const customUniforms = {
+//   uGlitterSize: { value: 350.0 },
+//   uGlitterDensity: { value: 0.1 }
+// }
 
-gui.addColor(debugObject, 'glitterColor').onChange(value => {
-  debugObject.glitterColor = value.toString()
-  const object = scene.getObjectByProperty('name', 'textMesh')
+// fontLoader.load('/fonts/pacifico/pacifico-regular-normal-400.json', font => {
+//   const textGeometry = new THREE.TextGeometry('glitter', {
+//     font: font,
+//     size: 5.5,
+//     height: 0.2,
+//     curveSegments: 20,
+//     bevelEnabled: true,
+//     bevelThickness: 1.2,
+//     bevelSize: 0.01,
+//     bevelOffset: 0,
+//     bevelSegments: 10
+//   })
 
-  object.geometry.dispose()
-  object.material.dispose()
-  scene.remove(object)
+//   textMaterial = new GlitterMaterial(customUniforms, {
+//     color: '#dc630f'
+//   })
+//   const mesh = new THREE.Mesh(textGeometry, textMaterial)
+//   mesh.name = 'textMesh'
+//   mesh.position.x = -10
 
-  mesh = addGlitterToText(textGeometry)
-})
+//   meshes.push(mesh)
+//   scene.add(mesh)
 
-gui
-  .add(customUniforms.uGlitterSize, 'value')
-  .min(50.0)
-  .max(500.0)
-  .step(10.0)
-  .name('glitterSize')
+//   createExamples()
+//   // createConfigDemo()
+// })
 
-gui
-  .add(customUniforms.uGlitterDensity, 'value')
-  .min(0.0)
-  .max(1.0)
-  .step(0.001)
-  .name('glitterDensity')
+// function createExamples () {
+//   const toursKnotExample = new THREE.Mesh(
+//     new THREE.TorusKnotGeometry(10, 3, 100, 16),
+//     new GlitterMaterial(customUniforms, {
+//       color: '#dc0fc3'
+//     })
+//   )
+// }
 
-gui.add(debugObject, 'animate').name('animate')
+// scene.add(new THREE.AmbientLight(0x444444, 2.6))
 
-function addGlitterToText (geometry) {
-  const material = new GlitterMaterial(customUniforms, {
-    color: debugObject.glitterColor
-  })
-  const mesh = new THREE.Mesh(geometry, material)
+// const light1 = new THREE.PointLight(0xffffff, 0.9)
+// light1.position.set(3, 30, 30)
+// scene.add(light1)
 
-  mesh.name = 'textMesh'
-  mesh.position.x = -10
-  scene.add(mesh)
-  return mesh
-}
+// // Mouse Move
+// function handleMouseMove (event) {
+//   mouse.x = (event.clientX / sizes.width) * 2 - 1
+//   mouse.y = -(event.clientY / sizes.height) * 2 + 1
+//   mouse.z = 1
 
-scene.add(new THREE.AmbientLight(0x444444, 2.6))
+//   const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5)
+//   vector.unproject(camera)
+//   const dir = vector.sub(camera.position).normalize()
+//   const distance = -camera.position.z / dir.z
+//   const pos = camera.position.clone().add(dir.multiplyScalar(distance))
 
-const light1 = new THREE.PointLight(0xffffff, 0.9)
-light1.position.set(3, 30, 30)
-scene.add(light1)
+//   light1.position.set(pos.x, pos.y, 10.0)
+//   mouse = pos
+// }
 
-// Mouse Move
-function handleMouseMove (event) {
-  mouse.x = (event.clientX / sizes.width) * 2 - 1
-  mouse.y = -(event.clientY / sizes.height) * 2 + 1
-  mouse.z = 1
+// window.addEventListener('mousemove', handleMouseMove)
 
-  const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5)
-  vector.unproject(camera)
-  const dir = vector.sub(camera.position).normalize()
-  const distance = -camera.position.z / dir.z
-  const pos = camera.position.clone().add(dir.multiplyScalar(distance))
+// window.addEventListener('resize', () => {
+//   sizes.width = window.innerWidth
+//   sizes.height = window.innerHeight
 
-  light1.position.set(pos.x, pos.y, 10.0)
-  mouse = pos
-}
+//   camera.aspect = sizes.width / sizes.height
+//   camera.updateProjectionMatrix()
 
-window.addEventListener('mousemove', handleMouseMove)
+//   renderer.setSize(sizes.width, sizes.height)
+//   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+// })
 
-window.addEventListener('resize', () => {
-  sizes.width = window.innerWidth
-  sizes.height = window.innerHeight
+// /**
+//  * Camera
+//  */
+// const camera = new THREE.PerspectiveCamera(
+//   27,
+//   window.innerWidth / window.innerHeight,
+//   1,
+//   3500
+// )
+// camera.position.z = 60
+// scene.add(camera)
 
-  camera.aspect = sizes.width / sizes.height
-  camera.updateProjectionMatrix()
+// // Controls
+// const controls = new OrbitControls(camera, canvas)
+// controls.enableDamping = true
+// controls.enabled = false
 
-  renderer.setSize(sizes.width, sizes.height)
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
+// /**
+//  * Renderer
+//  */
+// const renderer = new THREE.WebGLRenderer({
+//   canvas: canvas,
+//   antialias: true,
+//   alpha: true
+// })
 
-/**
- * Camera
- */
-const camera = new THREE.PerspectiveCamera(
-  27,
-  window.innerWidth / window.innerHeight,
-  1,
-  3500
-)
-camera.position.z = 60
-scene.add(camera)
+// renderer.setSize(sizes.width, sizes.height)
+// renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-// Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+// /**
+//  * Animate
+//  */
+// const clock = new THREE.Clock()
 
-/**
- * Renderer
- */
-const renderer = new THREE.WebGLRenderer({
-  canvas: canvas,
-  antialias: true
-})
+// const tick = () => {
+//   const elapsedTime = clock.getElapsedTime()
+//   controls.update()
 
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+//   // if (mesh && debugObject.animate) {
+//   //   mesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2
+//   //   mesh.rotation.y = Math.sin(elapsedTime * 0.3) * 0.2
+//   // }
 
-/**
- * Animate
- */
-const clock = new THREE.Clock()
+//   renderer.render(scene, camera)
+//   window.requestAnimationFrame(tick)
+// }
 
-const tick = () => {
-  const elapsedTime = clock.getElapsedTime()
-  controls.update()
+// tick()
 
-  if (mesh && debugObject.animate) {
-    mesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2
-    mesh.rotation.y = Math.sin(elapsedTime * 0.3) * 0.2
-  }
+// /**
+//  * Debug
+//  */
 
-  renderer.render(scene, camera)
-  window.requestAnimationFrame(tick)
-}
+// gui.addColor(debugObject, 'glitterColor').onChange(() => {
+//   textMaterial.color.set(debugObject.glitterColor)
+// })
 
-tick()
+// gui
+//   .add(customUniforms.uGlitterSize, 'value')
+//   .min(50.0)
+//   .max(500.0)
+//   .step(10.0)
+//   .name('glitterSize')
+
+// gui
+//   .add(customUniforms.uGlitterDensity, 'value')
+//   .min(0.0)
+//   .max(1.0)
+//   .step(0.001)
+//   .name('glitterDensity')
+
+// // gui.add(debugObject, 'animate').name('animate')

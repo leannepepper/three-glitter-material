@@ -1,19 +1,44 @@
-*
-{
-    margin: 0;
-    padding: 0;
+* {
+  margin: 0;
+  padding: 0;
 }
-
 html,
-body
-{
-    overflow: hidden;
+body,
+#root,
+canvas {
+  height: 100%;
 }
 
-.webgl
-{
-    position: fixed;
-    top: 0;
-    left: 0;
-    outline: none;
+html {
+  background: #a9ffff;
 }
+
+body {
+  margin: 0;
+}
+
+.webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+}
+/* 
+.examples {
+  position: absolute;
+  left: 50%;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  font-family: 'Quicksand', sans-serif;
+  top: 90%;
+}
+
+.examples:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+div {
+  position: relative;
+} */
