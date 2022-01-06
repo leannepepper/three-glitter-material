@@ -1,45 +1,35 @@
-import "./style.css";
-import React, { useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useControls } from "leva";
+import React, { useMemo, useRef } from "react";
 import { GlitterMaterial } from "./glitterMaterial";
-import * as dat from "dat.gui";
-
-const gui = new dat.GUI();
-
-const customUniforms = {
-  uGlitterSize: { value: 350.0 },
-  uGlitterDensity: { value: 0.1 },
-};
-
-const debugObject = {
-  glitterColor: "#0707f2",
-};
+import "./style.css";
 
 export function ConfigModel({ ...props }) {
-  const glitterMaterial = new GlitterMaterial(customUniforms, {
-    color: debugObject.glitterColor,
+  const sphere = useRef<THREE.Mesh>();
+
+  const levaControls = useControls({
+    uGlitterSize: { value: 350.0 },
+    uGlitterDensity: { value: 0.1 },
+    color: { value: "#0707f2" },
   });
 
-  useEffect(() => {
-    gui.addColor(debugObject, "glitterColor").onChange(() => {
-      glitterMaterial.color.set(debugObject.glitterColor);
-    });
-    gui
-      .add(customUniforms.uGlitterSize, "value")
-      .min(50.0)
-      .max(500.0)
-      .step(10.0)
-      .name("glitterSize");
-    gui
-      .add(customUniforms.uGlitterDensity, "value")
-      .min(0.0)
-      .max(1.0)
-      .step(0.001)
-      .name("glitterDensity");
+  const customUniforms = {};
+  for (const prop in levaControls) {
+    customUniforms[prop] = { value: levaControls[prop] };
+  }
+
+  const glitterMaterial = useMemo(() => {
+    return new GlitterMaterial(customUniforms, { color: levaControls.color });
+  }, [levaControls]);
+
+  useFrame(() => {
+    sphere.current.rotation.x += 0.001;
+    sphere.current.rotation.y += 0.002;
   });
 
   return (
-    <mesh {...props} material={glitterMaterial}>
-      <sphereGeometry args={[5, 32, 16]} />
+    <mesh ref={sphere} {...props} material={glitterMaterial}>
+      <sphereGeometry args={[5, 32, 32]} />
     </mesh>
   );
 }

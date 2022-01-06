@@ -1,4 +1,3 @@
-import './style.css'
 import * as THREE from 'three'
 
 export class GlitterMaterial extends THREE.MeshPhongMaterial {

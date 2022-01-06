@@ -23,11 +23,11 @@ export function ExampleModels({ ...props }) {
 
   return (
     <group ref={group} {...props} dispose={null}>
-      <mesh position={[-10, 0, 0]} material={glitterMaterial}>
+      <mesh position={[-6, 0, 0]} material={glitterMaterial}>
         <torusKnotGeometry args={[0.8, 0.35, 100, 16]} />
       </mesh>
       <Suzanne position={[0, 0, 0]} />
-      <mesh position={[10, 0, 0]} material={glitterMaterial}>
+      <mesh position={[6, 0, 0]} material={glitterMaterial}>
         <boxGeometry args={[2, 2, 2, 2]} />
       </mesh>
     </group>
