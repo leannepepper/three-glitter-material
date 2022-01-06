@@ -50,4 +50,4 @@ export function FryingPan({ ...props }) {
   );
 }
 
-useGLTF.preload("./FryingPan.gltf");
+useGLTF.preload("./gltf/FryingPan.gltf");
