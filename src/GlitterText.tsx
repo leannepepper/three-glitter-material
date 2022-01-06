@@ -44,7 +44,7 @@ export function GlitterText({
   //   const mesh = useRef(null);
 
   return (
-    <mesh material={glitterMaterial}>
+    <mesh {...props} material={glitterMaterial}>
       <textGeometry args={[children, config]} />
     </mesh>
   );
