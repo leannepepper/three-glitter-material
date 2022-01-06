@@ -1,7 +1,6 @@
 import "./style.css";
 import React from "react";
 import { GlitterMaterial } from "./glitterMaterial";
-import { FryingPan } from "./Models/FryingPan";
 import { Suzanne } from "./Models/Suzanne";
 
 const customUniforms = {
@@ -28,11 +27,9 @@ export function ExampleModels() {
 
       <Suzanne position={[0, -5, 0]} />
 
-      <FryingPan
-        position={[10, -5, 0]}
-        rotation={[0.3, 3.0, 0.0]}
-        scale={[1.5, 1.5, 1.5]}
-      />
+      <mesh position={[10, -5, 0]} material={glitterMaterial}>
+        <boxGeometry args={[2, 2, 2, 2]} />
+      </mesh>
     </>
   );
 }

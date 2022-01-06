@@ -4,7 +4,6 @@ import { GlitterText } from "./GlitterText";
 import { MouseLight } from "./MouseLight";
 import { OrbitControls } from "@react-three/drei";
 import { ExampleModels } from "./ExampleModels";
-import { FryingPan } from "./Models/FryingPan";
 import "./style.css";
 
 export default function App() {
@@ -22,11 +21,6 @@ export default function App() {
       <MouseLight />
       <OrbitControls enableZoom={true} enablePan={false} />
       <Suspense fallback={null}>
-        {/* <FryingPan
-          position={[0, 0, 0]}
-          rotation={[0.3, 3.0, 0.0]}
-          scale={[1.5, 1.5, 1.5]}
-        /> */}
         <GlitterText position={[-5, 0, 0]} children="glitter" />
         <ExampleModels />
       </Suspense>
