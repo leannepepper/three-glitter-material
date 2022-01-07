@@ -5,7 +5,7 @@ import { GlitterText } from "./GlitterText";
 import { MouseLight } from "./MouseLight";
 import { ExampleModels } from "./ExampleModels";
 import { ConfigModel } from "./ConfigModel";
-import { ScrollControls, Scroll } from "@react-three/drei";
+import { ScrollControls, Scroll, OrbitControls } from "@react-three/drei";
 
 export default function App() {
   const objectsDistance = 25;
@@ -22,28 +22,30 @@ export default function App() {
     >
       <ambientLight intensity={3.6} color={0x444444} />
       <MouseLight />
-      <ScrollControls
-        pages={3}
+      {/* <ScrollControls
+        pages={1}
         distance={1}
         damping={3}
         horizontal={false}
         infinite={false}
-      >
-        <Suspense fallback={null}>
-          <Scroll>
-            <GlitterText position={[-6, 0, 0]} children="glitter" />
-          </Scroll>
-          <Scroll>
+      > */}
+      <Suspense fallback={null}>
+        {/* <Scroll> */}
+        <OrbitControls />
+        <GlitterText position={[-8, 0, 0]} children="glitter" />
+        {/* </Scroll> */}
+        {/* <Scroll>
             <ExampleModels
               position={[0, -objectsDistance * 1, 0]}
               scale={[2.0, 2.0, 2.0]}
             />
-          </Scroll>
-          <Scroll>
+          </Scroll> */}
+        {/* <Scroll>
+            <ambientLight intensity={3.6} color={0x444444} />
             <ConfigModel position={[-5, -objectsDistance * 2, 0]} />
-          </Scroll>
-        </Suspense>
-      </ScrollControls>
+          </Scroll> */}
+      </Suspense>
+      {/* </ScrollControls> */}
     </Canvas>
   );
 }

@@ -8,9 +8,10 @@ export function ConfigModel({ ...props }) {
   const sphere = useRef<THREE.Mesh>();
 
   const levaControls = useControls({
-    uGlitterSize: { value: 350.0 },
-    uGlitterDensity: { value: 0.1 },
-    color: { value: "#0707f2" },
+    uGlitterSize: { value: 30.0 },
+    uGlitterDensity: { value: 1.0 },
+    color: { value: "#a007f2" },
+    animate: { value: true },
   });
 
   const customUniforms = {};
@@ -23,8 +24,10 @@ export function ConfigModel({ ...props }) {
   }, [levaControls]);
 
   useFrame(() => {
-    sphere.current.rotation.x += 0.001;
-    sphere.current.rotation.y += 0.002;
+    if (levaControls.animate) {
+      sphere.current.rotation.x += 0.001;
+      sphere.current.rotation.y += 0.002;
+    }
   });
 
   return (

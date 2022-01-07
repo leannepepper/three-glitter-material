@@ -1,28 +1,41 @@
 import "./style.css";
-import { extend, useLoader } from "@react-three/fiber";
-import React, { useEffect, useMemo } from "react";
+import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { useControls } from "leva";
+import React, { useEffect, useMemo, useRef } from "react";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { GlitterMaterial } from "./glitterMaterial";
+import { useScroll } from "@react-three/drei";
 
 extend({ TextGeometry });
 
-const customUniforms = {
-  uGlitterSize: { value: 350.0 },
-  uGlitterDensity: { value: 0.1 },
-};
+export function GlitterText({ children, ...props }) {
+  const textMesh = useRef<THREE.Mesh>();
+  const { mouse, camera } = useThree();
 
-const debugObject = {
-  glitterColor: "#f20707",
-};
+  const levaControls = useControls({
+    uGlitterSize: { value: 30.0 },
+    uGlitterDensity: { value: 1.0 },
+    color: { value: "#a007f2" },
+    // parallax: { value: true },
+  });
 
-export function GlitterText({
-  children,
-  color = debugObject.glitterColor,
-  ...props
-}) {
+  const customUniforms = {};
+  for (const prop in levaControls) {
+    customUniforms[prop] = { value: levaControls[prop] };
+  }
+
   const glitterMaterial = new GlitterMaterial(customUniforms, {
-    color: debugObject.glitterColor,
+    color: levaControls.color,
+  });
+
+  useFrame((state, delta) => {
+    // if (levaControls.parallax) {
+    //   const parallaxX = mouse.x;
+    //   const parallaxY = -mouse.y;
+    //   camera.position.x += (parallaxX - camera.position.x) * 5 * delta;
+    //   camera.position.y += (parallaxY - camera.position.y) * 5 * delta;
+    // }
   });
 
   const font = useLoader(
@@ -33,7 +46,7 @@ export function GlitterText({
   const config = useMemo(
     () => ({
       font,
-      size: 3.5,
+      size: 4.5,
       height: 0.2,
       curveSegments: 20,
       bevelEnabled: true,
@@ -46,7 +59,7 @@ export function GlitterText({
   );
 
   return (
-    <mesh {...props} material={glitterMaterial}>
+    <mesh ref={textMesh} {...props} material={glitterMaterial}>
       <textGeometry args={[children, config]} />
     </mesh>
   );
