@@ -5,38 +5,29 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { GlitterMaterial } from "./glitterMaterial";
-import { useScroll } from "@react-three/drei";
 
 extend({ TextGeometry });
 
 export function GlitterText({ children, ...props }) {
   const textMesh = useRef<THREE.Mesh>();
-  const { mouse, camera } = useThree();
+  const { mouse, camera, viewport } = useThree();
 
-  const levaControls = useControls({
+  const customUniforms = {
     uGlitterSize: { value: 30.0 },
     uGlitterDensity: { value: 1.0 },
     color: { value: "#a007f2" },
-    // parallax: { value: true },
-  });
-
-  const customUniforms = {};
-  for (const prop in levaControls) {
-    customUniforms[prop] = { value: levaControls[prop] };
-  }
+  };
 
   const glitterMaterial = new GlitterMaterial(customUniforms, {
-    color: levaControls.color,
+    color: customUniforms.color.value,
   });
 
-  useFrame((state, delta) => {
-    // if (levaControls.parallax) {
-    //   const parallaxX = mouse.x;
-    //   const parallaxY = -mouse.y;
-    //   camera.position.x += (parallaxX - camera.position.x) * 5 * delta;
-    //   camera.position.y += (parallaxY - camera.position.y) * 5 * delta;
-    // }
-  });
+  //   useFrame((state, delta) => {
+  //     const parallaxX = mouse.x;
+  //     const parallaxY = -mouse.y;
+  //     camera.position.x += (parallaxX - camera.position.x) * 5 * delta;
+  //     camera.position.y += (parallaxY - camera.position.y) * 5 * delta;
+  //   });
 
   const font = useLoader(
     FontLoader,
@@ -46,21 +37,31 @@ export function GlitterText({ children, ...props }) {
   const config = useMemo(
     () => ({
       font,
-      size: 4.5,
+      size: 3.5,
       height: 0.2,
       curveSegments: 20,
       bevelEnabled: true,
-      bevelThickness: 1.2,
+      bevelThickness: 0.5,
       bevelSize: 0.01,
       bevelOffset: 0,
       bevelSegments: 10,
     }),
     [font]
   );
+  const textGeometry = new TextGeometry("glitter", config);
+
+  useEffect(() => {
+    textGeometry.computeBoundingBox();
+    textGeometry.center();
+  });
 
   return (
-    <mesh ref={textMesh} {...props} material={glitterMaterial}>
-      <textGeometry args={[children, config]} />
-    </mesh>
+    <mesh
+      ref={textMesh}
+      position={[0, 8, 0]}
+      {...props}
+      material={glitterMaterial}
+      geometry={textGeometry}
+    ></mesh>
   );
 }

@@ -32,7 +32,7 @@ export function ConfigModel({ ...props }) {
 
   return (
     <mesh ref={sphere} {...props} material={glitterMaterial}>
-      <sphereGeometry args={[5, 32, 32]} />
+      <sphereGeometry args={[3, 32, 32]} />
     </mesh>
   );
 }

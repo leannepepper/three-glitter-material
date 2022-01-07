@@ -16,3 +16,31 @@ html {
 body {
   margin: 0;
 }
+
+.code {
+  position: absolute;
+  background: #24292e;
+  padding: 14px;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: auto;
+  left: 0;
+  right: 0;
+}
+
+.install {
+  text-align: center;
+  max-width: 350px;
+  top: 35%;
+}
+
+.example {
+  top: 45%;
+  max-width: 600px;
+}
+#leva__root .leva-c-kWgxhW {
+  left: 53%;
+  top: 68%;
+}

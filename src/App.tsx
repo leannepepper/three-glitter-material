@@ -1,15 +1,11 @@
-import "./style.css";
 import { Canvas } from "@react-three/fiber";
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
+import { ConfigModel } from "./ConfigModel";
 import { GlitterText } from "./GlitterText";
 import { MouseLight } from "./MouseLight";
-import { ExampleModels } from "./ExampleModels";
-import { ConfigModel } from "./ConfigModel";
-import { ScrollControls, Scroll, OrbitControls } from "@react-three/drei";
+import "./style.css";
 
 export default function App() {
-  const objectsDistance = 25;
-
   return (
     <Canvas
       camera={{
@@ -22,30 +18,10 @@ export default function App() {
     >
       <ambientLight intensity={3.6} color={0x444444} />
       <MouseLight />
-      {/* <ScrollControls
-        pages={1}
-        distance={1}
-        damping={3}
-        horizontal={false}
-        infinite={false}
-      > */}
       <Suspense fallback={null}>
-        {/* <Scroll> */}
-        <OrbitControls />
-        <GlitterText position={[-8, 0, 0]} children="glitter" />
-        {/* </Scroll> */}
-        {/* <Scroll>
-            <ExampleModels
-              position={[0, -objectsDistance * 1, 0]}
-              scale={[2.0, 2.0, 2.0]}
-            />
-          </Scroll> */}
-        {/* <Scroll>
-            <ambientLight intensity={3.6} color={0x444444} />
-            <ConfigModel position={[-5, -objectsDistance * 2, 0]} />
-          </Scroll> */}
+        <GlitterText rotation={[0.15, 0, 0]} children="glitter" />
+        <ConfigModel position={[-5, -8, 0]} />
       </Suspense>
-      {/* </ScrollControls> */}
     </Canvas>
   );
 }
