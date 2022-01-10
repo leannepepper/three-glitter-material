@@ -8,7 +8,7 @@ export function ConfigModel({ ...props }) {
   const sphere = useRef<THREE.Mesh>();
 
   const levaControls = useControls({
-    uGlitterSize: { value: 30.0 },
+    uGlitterSize: { value: 50.0 },
     uGlitterDensity: { value: 1.0 },
     color: { value: "#a007f2" },
     animate: { value: true },
