@@ -25,6 +25,7 @@ body {
   font-size: 16px;
   border-radius: 10px;
   max-width: 600px;
+  min-width: 320px;
   margin: auto;
   left: 0;
   right: 0;
@@ -43,4 +44,20 @@ body {
 #leva__root .leva-c-kWgxhW {
   left: 53%;
   top: 68%;
+}
+
+@media only screen and (max-width: 600px) {
+  .example {
+    overflow-x: scroll;
+  }
+
+  #leva__root .leva-c-kWgxhW {
+    left: 46%;
+    top: 70%;
+  }
+
+  #leva__root {
+    --leva-sizes-rootWidth: 200px !important;
+    --leva-sizes-controlWidth: 100px !important;
+  }
 }

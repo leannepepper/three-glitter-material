@@ -20,7 +20,7 @@ export default function App() {
       <MouseLight />
       <Suspense fallback={null}>
         <GlitterText rotation={[0.15, 0, 0]} children="glitter" />
-        <ConfigModel position={[-5, -8, 0]} />
+        <ConfigModel position={[-4, -8.5, 0]} />
       </Suspense>
     </Canvas>
   );
