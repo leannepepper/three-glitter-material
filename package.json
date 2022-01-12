@@ -4,7 +4,7 @@
   "scripts": {
     "build": "webpack --config ./bundler/webpack.prod.js",
     "dev": "webpack serve --config ./bundler/webpack.dev.js",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "yarn build && gh-pages -d dist"
   },
   "dependencies": {
     "@babel/core": "^7.14.6",
@@ -17,7 +17,7 @@
     "@types/react-dom": "^17.0.11",
     "@types/three": "^0.136.1",
     "babel-loader": "^8.2.2",
-    "clean-webpack-plugin": "^3.0.0",
+    "clean-webpack-plugin": "4.0.0-alpha.0",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^5.2.6",
     "file-loader": "^6.2.0",
@@ -39,5 +39,8 @@
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.8.0"
+  },
+  "devDependencies": {
+    "@types/copy-webpack-plugin": "^10.1.0"
   }
 }
