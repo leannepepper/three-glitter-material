@@ -31,7 +31,7 @@ export function GlitterText({ children, ...props }) {
 
   const font = useLoader(
     FontLoader,
-    "/fonts/pacifico/pacifico-regular-normal-400.json"
+    "../fonts/pacifico/pacifico-regular-normal-400.json"
   );
 
   const config = useMemo(
