@@ -18,7 +18,9 @@ export function MouseLight() {
       const distance = -camera.position.z / dir.z;
       const pos = camera.position.clone().add(dir.multiplyScalar(distance));
 
-      pointLight.current.position.set(pos.x, pos.y, 10.0);
+      if (pointLight.current) {
+        pointLight.current.position.set(pos.x, pos.y, 10.0);
+      }
     }
     window.addEventListener("mousemove", handleMouseMove);
   }, []);

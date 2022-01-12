@@ -2,7 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import React, { Suspense } from "react";
 import { ConfigModel } from "./ConfigModel";
 import { GlitterText } from "./GlitterText";
-// import { MouseLight } from "./MouseLight";
+import { MouseLight } from "./MouseLight";
 import "./style.css";
 
 export default function App() {
@@ -11,13 +11,13 @@ export default function App() {
       camera={{
         position: [0, 0, 60],
         fov: 27,
-        aspect: window.innerWidth / window.innerHeight,
+        aspect: window.innerWidth / 2 / (window.innerHeight / 2),
         near: 1,
-        far: 3500,
+        far: 800,
       }}
     >
-      <ambientLight intensity={3.6} color={0x444444} />
-      {/* <MouseLight /> */}
+      <ambientLight intensity={1.5} color={0x444444} />
+      <MouseLight />
       <Suspense fallback={null}>
         <GlitterText rotation={[0.15, 0, 0]} children="glitter" />
         <ConfigModel position={[-4, -8.5, 0]} />
