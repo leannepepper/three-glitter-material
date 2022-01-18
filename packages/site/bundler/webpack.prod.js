@@ -7,8 +7,7 @@ module.exports = merge(commonConfiguration, {
   mode: 'production',
   output: {
     filename: 'bundle.[contenthash].js',
-    path: path.resolve(__dirname, '../dist'),
-    publicPath: '/glitter-material'
+    path: path.resolve(__dirname, '../dist')
   },
   plugins: [new CleanWebpackPlugin()]
 })
