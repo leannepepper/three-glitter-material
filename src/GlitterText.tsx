@@ -22,13 +22,6 @@ export function GlitterText({ children, ...props }) {
     color: customUniforms.color.value,
   });
 
-  //   useFrame((state, delta) => {
-  //     const parallaxX = mouse.x;
-  //     const parallaxY = -mouse.y;
-  //     camera.position.x += (parallaxX - camera.position.x) * 5 * delta;
-  //     camera.position.y += (parallaxY - camera.position.y) * 5 * delta;
-  //   });
-
   const font = useLoader(
     FontLoader,
     "./fonts/pacifico/pacifico-regular-normal-400.json"

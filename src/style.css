@@ -60,4 +60,8 @@ body {
     --leva-sizes-rootWidth: 200px !important;
     --leva-sizes-controlWidth: 100px !important;
   }
+
+  .code {
+    border-radius: 0px;
+  }
 }

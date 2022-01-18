@@ -16,7 +16,7 @@ export default function App() {
         far: 800,
       }}
     >
-      <ambientLight intensity={1.5} color={0x444444} />
+      <ambientLight intensity={2.5} color={0x444444} />
       <MouseLight />
       <Suspense fallback={null}>
         <GlitterText rotation={[0.15, 0, 0]} children="glitter" />

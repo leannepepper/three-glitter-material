@@ -29,7 +29,7 @@ export function MouseLight() {
       ref={pointLight}
       position={[0, 0, 10]}
       color={0xffffff}
-      intensity={0.2}
+      intensity={0.35}
     />
   );
 }
