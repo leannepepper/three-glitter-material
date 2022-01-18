@@ -34,12 +34,13 @@ body {
 .install {
   text-align: center;
   max-width: 350px;
-  top: 35%;
+  top: 30%;
 }
 
 .example {
-  top: 45%;
+  top: 39%;
   max-width: 600px;
+  overflow-x: scroll;
 }
 #leva__root .leva-c-kWgxhW {
   left: 53%;
@@ -47,10 +48,6 @@ body {
 }
 
 @media only screen and (max-width: 600px) {
-  .example {
-    overflow-x: scroll;
-  }
-
   #leva__root .leva-c-kWgxhW {
     left: 46%;
     top: 70%;

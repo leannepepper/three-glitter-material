@@ -11,10 +11,15 @@ npm install three-glitter-material
 ```javascript
 import { GlitterMaterial } from 'three-glitter-material'
 
-const glitterMaterial = new GlitterMaterial(
-  { uGlitterSize: 50.0, uGlitterDensity: 1.0 },
-  { color: '#a007f2' }
-)
+const customUniforms = {
+  uGlitterSize: { value: 30.0 },
+  uGlitterDensity: { value: 1.0 },
+  color: { value: '#a007f2' }
+}
+
+const glitterMaterial = new GlitterMaterial(customUniforms, {
+  color: customUniforms.color.value
+})
 
 const geometry = new THREE.Sphere(3, 32, 32)
 mesh = new THREE.Mesh(geometry, glitterMaterial)

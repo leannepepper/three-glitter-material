@@ -1,26 +1,23 @@
 import { extend, useLoader, useThree } from "@react-three/fiber";
 import React, { useEffect, useMemo, useRef } from "react";
-import { Material } from "three";
+import { GlitterMaterial } from "three-glitter-material";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import { GlitterMaterial } from "three-glitter-material";
 import "./style.css";
 
 extend({ TextGeometry });
 
 export function GlitterText({ children, ...props }) {
   const textMesh = useRef<THREE.Mesh>();
-  const { mouse, camera, viewport } = useThree();
 
   const customUniforms = {
-    uGlitterSize: { value: 30.0 },
+    uGlitterSize: { value: 100.0 },
     uGlitterDensity: { value: 1.0 },
-    color: { value: "#a007f2" },
   };
 
   const glitterMaterial = new GlitterMaterial(customUniforms, {
-    color: customUniforms.color.value,
-  }) as any;
+    color: "#a007f2",
+  });
 
   const font = useLoader(
     FontLoader,
@@ -51,7 +48,7 @@ export function GlitterText({ children, ...props }) {
   return (
     <mesh
       ref={textMesh}
-      position={[0, 8, 0]}
+      position={[0, 9.5, 0]}
       {...props}
       material={glitterMaterial}
       geometry={textGeometry}
