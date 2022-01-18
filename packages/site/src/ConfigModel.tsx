@@ -1,7 +1,8 @@
 import { useFrame } from "@react-three/fiber";
 import { useControls } from "leva";
 import React, { useMemo, useRef } from "react";
-import { GlitterMaterial } from "./glitterMaterial";
+import { Material } from "three";
+import { GlitterMaterial } from "three-glitter-material";
 import "./style.css";
 
 export function ConfigModel({ ...props }) {
@@ -20,7 +21,9 @@ export function ConfigModel({ ...props }) {
   }
 
   const glitterMaterial = useMemo(() => {
-    return new GlitterMaterial(customUniforms, { color: levaControls.color });
+    return new GlitterMaterial(customUniforms, {
+      color: levaControls.color,
+    }) as any;
   }, [levaControls]);
 
   useFrame(() => {

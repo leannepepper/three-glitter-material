@@ -1,0 +1,23 @@
+{
+  "name": "three-glitter-material",
+  "version": "0.1.0",
+  "description": "A glitter material for threejs",
+  "repository": "https://github.com/leannepepper/glitter-material.git",
+  "author": "Leanne Werner <leanne.werner.lw@gmail.com>",
+  "license": "MIT",
+  "source": "index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
+  "scripts": {
+    "prepublishOnly": "yarn build",
+    "build": "microbundle",
+    "dev": "microbundle watch"
+  },
+  "peerDependencies": {
+    "three": ">=0.133"
+  },
+  "devDependencies": {
+    "microbundle": "^0.14.2"
+  }
+}

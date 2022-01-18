@@ -1,10 +1,10 @@
-import "./style.css";
-import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { useControls } from "leva";
+import { extend, useLoader, useThree } from "@react-three/fiber";
 import React, { useEffect, useMemo, useRef } from "react";
+import { Material } from "three";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
-import { GlitterMaterial } from "./glitterMaterial";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
+import { GlitterMaterial } from "three-glitter-material";
+import "./style.css";
 
 extend({ TextGeometry });
 
@@ -20,7 +20,7 @@ export function GlitterText({ children, ...props }) {
 
   const glitterMaterial = new GlitterMaterial(customUniforms, {
     color: customUniforms.color.value,
-  });
+  }) as any;
 
   const font = useLoader(
     FontLoader,
