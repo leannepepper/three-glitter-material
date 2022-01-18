@@ -7,8 +7,6 @@
   "license": "MIT",
   "source": "index.js",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.module.js",
-  "unpkg": "./dist/index.umd.js",
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "microbundle",
