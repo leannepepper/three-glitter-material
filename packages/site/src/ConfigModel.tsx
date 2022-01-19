@@ -1,7 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import { useControls } from "leva";
 import React, { useMemo, useRef } from "react";
-import { Material } from "three";
 import { GlitterMaterial } from "three-glitter-material";
 import "./style.css";
 
@@ -9,8 +8,8 @@ export function ConfigModel({ ...props }) {
   const sphere = useRef<THREE.Mesh>();
 
   const levaControls = useControls({
-    uGlitterSize: { value: 50.0 },
-    uGlitterDensity: { value: 1.0 },
+    uGlitterSize: { value: 50.0, min: 1.0, max: 200.0 },
+    uGlitterDensity: { value: 1.0, min: 0.0, max: 3.0 },
     color: { value: "#a007f2" },
     animate: { value: true },
   });

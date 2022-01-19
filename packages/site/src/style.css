@@ -48,6 +48,12 @@ body {
 }
 
 @media only screen and (max-width: 600px) {
+  .example {
+    overflow: scroll;
+    height: 150px;
+    max-height: 150px;
+  }
+
   #leva__root .leva-c-kWgxhW {
     left: 46%;
     top: 70%;
