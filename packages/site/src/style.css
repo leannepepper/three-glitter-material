@@ -47,6 +47,13 @@ body {
   top: 68%;
 }
 
+.gh-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 15px;
+}
+
 @media only screen and (max-width: 600px) {
   .example {
     overflow: scroll;
